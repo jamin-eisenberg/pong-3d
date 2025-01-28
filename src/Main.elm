@@ -1,11 +1,14 @@
 module Main exposing (main)
 
 import Angle
+import Block3d
 import Browser
 import Browser.Dom as Dom
 import Browser.Events as Events
 import Camera3d
+import Color
 import Direction3d
+import Frame3d
 import Html
 import Html.Attributes as Attributes exposing (width)
 import Length
@@ -13,6 +16,8 @@ import Pixels
 import Point3d
 import Quantity
 import Scene3d
+import Scene3d.Material as Material
+import Sphere3d
 import Task
 import Viewpoint3d
 
@@ -91,12 +96,31 @@ camera =
     Camera3d.perspective
         { viewpoint =
             Viewpoint3d.lookAt
-                { eyePoint = Point3d.meters 3 4 2
-                , focalPoint = Point3d.meters -0.5 -0.5 0
+                { eyePoint = Point3d.meters 0 7 0
+                , focalPoint = Point3d.meters 0 0 0
                 , upDirection = Direction3d.positiveZ
                 }
         , verticalFieldOfView = Angle.degrees 24
         }
+
+
+boxFrame : List (Scene3d.Entity coordinates)
+boxFrame =
+    let
+        boxFrameLines =
+            Block3d.centeredOn Frame3d.atOrigin ( Length.meters 2, Length.meters 2, Length.meters 2 )
+                |> Block3d.edges
+    in
+    List.map
+        (Scene3d.lineSegment (Material.color Color.white))
+        boxFrameLines
+
+
+ballSphere : Scene3d.Entity coordinates
+ballSphere =
+    Scene3d.sphere
+        (Material.nonmetal { baseColor = Color.lightBlue, roughness = 0 })
+        (Sphere3d.atPoint (Point3d.meters 0 0 0) (Length.meters 0.2))
 
 
 view : Model -> Html.Html Msg
@@ -115,9 +139,9 @@ view model =
                 ( Pixels.int (round (Pixels.toFloat model.viewportSize.width))
                 , Pixels.int (round (Pixels.toFloat model.viewportSize.height))
                 )
-            , background = Scene3d.transparentBackground
+            , background = Scene3d.backgroundColor Color.darkCharcoal
             , clipDepth = Length.meters 0.1
-            , entities = []
+            , entities = boxFrame ++ [ ballSphere ]
             }
         ]
 
