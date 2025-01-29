@@ -97,10 +97,10 @@ camera =
         { viewpoint =
             Viewpoint3d.lookAt
                 { eyePoint = Point3d.meters 0 7 0
-                , focalPoint = Point3d.meters 0 0 0
+                , focalPoint = Point3d.origin
                 , upDirection = Direction3d.positiveZ
                 }
-        , verticalFieldOfView = Angle.degrees 24
+        , verticalFieldOfView = Angle.degrees 30
         }
 
 
@@ -119,8 +119,8 @@ boxFrame =
 ballSphere : Scene3d.Entity coordinates
 ballSphere =
     Scene3d.sphere
-        (Material.nonmetal { baseColor = Color.lightBlue, roughness = 0 })
-        (Sphere3d.atPoint (Point3d.meters 0 0 0) (Length.meters 0.2))
+        (Material.nonmetal { baseColor = Color.white, roughness = 0 })
+        (Sphere3d.atPoint (Point3d.meters 0 0 0) (Length.meters 0.1))
 
 
 view : Model -> Html.Html Msg
