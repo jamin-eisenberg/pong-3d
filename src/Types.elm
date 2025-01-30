@@ -3,11 +3,13 @@ module Types exposing (..)
 import Browser exposing (UrlRequest)
 import Browser.Navigation exposing (Key)
 import Url exposing (Url)
-
+import Time
+import Lamdera exposing (ClientId)
 
 type alias FrontendModel =
     { key : Key
     , message : String
+    , mostRecentRoundTripTime: Int -- ms
     }
 
 
@@ -19,11 +21,13 @@ type alias BackendModel =
 type FrontendMsg
     = UrlClicked UrlRequest
     | UrlChanged Url
+    | Tick Time.Posix
+    | GotResponse Time.Posix Time.Posix
     | NoOpFrontendMsg
 
 
 type ToBackend
-    = NoOpToBackend
+    = Request Time.Posix
 
 
 type BackendMsg
@@ -31,4 +35,4 @@ type BackendMsg
 
 
 type ToFrontend
-    = NoOpToFrontend
+    = Response Time.Posix

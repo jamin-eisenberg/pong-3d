@@ -7,6 +7,9 @@ import Html.Attributes as Attr
 import Lamdera
 import Types exposing (..)
 import Url
+import Browser.Events exposing (onAnimationFrame)
+import Time
+import Task
 
 
 type alias Model =
@@ -21,7 +24,7 @@ app =
         , onUrlChange = UrlChanged
         , update = update
         , updateFromBackend = updateFromBackend
-        , subscriptions = \m -> Sub.none
+        , subscriptions = \_ -> onAnimationFrame Tick
         , view = view
         }
 
@@ -30,6 +33,7 @@ init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
     ( { key = key
       , message = "Welcome to Lamdera! You're looking at the auto-generated base implementation. Check out src/Frontend.elm to start coding!"
+      , mostRecentRoundTripTime = 0
       }
     , Cmd.none
     )
@@ -38,6 +42,12 @@ init url key =
 update : FrontendMsg -> Model -> ( Model, Cmd FrontendMsg )
 update msg model =
     case msg of
+        Tick currentTime ->
+            (model, Lamdera.sendToBackend (Request currentTime))
+
+        GotResponse requestTime currentTime ->
+            ({model | mostRecentRoundTripTime = (Time.posixToMillis currentTime) - (Time.posixToMillis requestTime)}, Cmd.none)
+        
         UrlClicked urlRequest ->
             case urlRequest of
                 Internal url ->
@@ -60,8 +70,8 @@ update msg model =
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
-        NoOpToFrontend ->
-            ( model, Cmd.none )
+        Response requestTime ->
+            ( model, Task.perform (GotResponse requestTime) Time.now )
 
 
 view : Model -> Browser.Document FrontendMsg
@@ -74,7 +84,7 @@ view model =
                 [ Attr.style "font-family" "sans-serif"
                 , Attr.style "padding-top" "40px"
                 ]
-                [ Html.text model.message ]
+                [ Html.text (String.fromInt model.mostRecentRoundTripTime) ]
             ]
         ]
     }

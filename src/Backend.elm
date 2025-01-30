@@ -2,6 +2,7 @@ module Backend exposing (..)
 
 import Lamdera exposing (ClientId, SessionId)
 import Types exposing (..)
+import Lamdera exposing (sendToFrontend)
 
 
 type alias Model =
@@ -27,12 +28,13 @@ init =
 update : BackendMsg -> Model -> ( Model, Cmd BackendMsg )
 update msg model =
     case msg of
-        NoOpBackendMsg ->
-            ( model, Cmd.none )
+        NoOpBackendMsg -> 
+            (model, Cmd.none)
 
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> Model -> ( Model, Cmd BackendMsg )
 updateFromFrontend sessionId clientId msg model =
     case msg of
-        NoOpToBackend ->
-            ( model, Cmd.none )
+        Request time ->
+            ( model, sendToFrontend clientId (Response time))
+        
