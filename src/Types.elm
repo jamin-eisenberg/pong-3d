@@ -1,33 +1,24 @@
 module Types exposing (..)
 
-import Browser exposing (UrlRequest)
-import Browser.Navigation exposing (Key)
-import Url exposing (Url)
-import Time
+import Evergreen.V1.Types exposing (ToFrontend(..))
 import Lamdera exposing (ClientId)
+import Url exposing (Url)
+
 
 type alias FrontendModel =
-    { key : Key
-    , message : String
-    , mostRecentRoundTripTime: Int -- ms
-    }
+    {}
 
 
 type alias BackendModel =
-    { message : String
-    }
+    {}
 
 
 type FrontendMsg
-    = UrlClicked UrlRequest
-    | UrlChanged Url
-    | Tick Time.Posix
-    | GotResponse Time.Posix Time.Posix
-    | NoOpFrontendMsg
+    = NoOpFrontendMsg
 
 
 type ToBackend
-    = Request Time.Posix
+    = NoOpToBackend
 
 
 type BackendMsg
@@ -35,4 +26,4 @@ type BackendMsg
 
 
 type ToFrontend
-    = Response Time.Posix
+    = NoOpToFrontend

@@ -2,7 +2,6 @@ module Backend exposing (..)
 
 import Lamdera exposing (ClientId, SessionId)
 import Types exposing (..)
-import Lamdera exposing (sendToFrontend)
 
 
 type alias Model =
@@ -20,7 +19,7 @@ app =
 
 init : ( Model, Cmd BackendMsg )
 init =
-    ( { message = "Hello!" }
+    ( {}
     , Cmd.none
     )
 
@@ -28,13 +27,12 @@ init =
 update : BackendMsg -> Model -> ( Model, Cmd BackendMsg )
 update msg model =
     case msg of
-        NoOpBackendMsg -> 
-            (model, Cmd.none)
+        NoOpBackendMsg ->
+            ( model, Cmd.none )
 
 
 updateFromFrontend : SessionId -> ClientId -> ToBackend -> Model -> ( Model, Cmd BackendMsg )
 updateFromFrontend sessionId clientId msg model =
     case msg of
-        Request time ->
-            ( model, sendToFrontend clientId (Response time))
-        
+        NoOpToBackend ->
+            ( model, Cmd.none )
