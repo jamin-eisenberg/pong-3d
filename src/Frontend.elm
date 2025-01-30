@@ -24,7 +24,8 @@ app =
         , onUrlChange = UrlChanged
         , update = update
         , updateFromBackend = updateFromBackend
-        , subscriptions = \_ -> onAnimationFrame Tick
+        -- , subscriptions = \_ -> onAnimationFrame Tick
+                , subscriptions = \_ -> Time.every (1000 / 60) Tick
         , view = view
         }
 
