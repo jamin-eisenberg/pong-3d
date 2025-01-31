@@ -38,4 +38,4 @@ updateFromFrontend sessionId clientId msg model =
             ( model, Cmd.none )
 
         PlayerInput keys ->
-            Debug.todo "player input"
+            ( model, Cmd.none )
