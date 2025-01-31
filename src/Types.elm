@@ -12,13 +12,9 @@ import Vector2d exposing (Vector2d)
 
 
 type alias FrontendModel =
-    { keysPressed : Keys
+    { keysPressed : Set Key
     , viewportSize : { width : Quantity Int Pixels, height : Quantity Int Pixels }
     }
-
-
-type alias Keys =
-    Set Key
 
 
 type FrontendPlayerCoordinates
@@ -57,7 +53,7 @@ type PlayerMovementDirection
 
 type ToBackend
     = NoOpToBackend
-    | PlayerInput Keys
+    | PlayerInput (Set PlayerMovementDirection)
 
 
 type BackendMsg

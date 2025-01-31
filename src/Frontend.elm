@@ -100,11 +100,20 @@ update msg model =
 
 updateKeysIfChanged : Set Key -> Model -> ( Model, Cmd FrontendMsg )
 updateKeysIfChanged newKeysPressed model =
-    if AssocSet.eq newKeysPressed model.keysPressed then
+    let
+        newDirectionsPressed =
+            newKeysPressed
+                |> AssocSet.map keyToPlayerDirection
+    in
+    if AssocSet.eq newDirectionsPressed (AssocSet.map keyToPlayerDirection model.keysPressed) then
         ( model, Cmd.none )
 
     else
-        ( { model | keysPressed = newKeysPressed }, Lamdera.sendToBackend (PlayerInput newKeysPressed) )
+        ( { model | keysPressed = newKeysPressed }
+        , newDirectionsPressed
+            |> PlayerInput
+            |> Lamdera.sendToBackend
+        )
 
 
 keysToDirection : Set Key -> Vector2d MetersPerSecond FrontendPlayerCoordinates
