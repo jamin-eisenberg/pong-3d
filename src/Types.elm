@@ -4,6 +4,7 @@ import AssocSet exposing (Set)
 import Direction2d exposing (Direction2d)
 import Evergreen.V1.Types exposing (ToFrontend(..))
 import Lamdera exposing (ClientId)
+import Physics.World exposing (World)
 import Pixels exposing (Pixels)
 import Quantity exposing (Quantity)
 import Speed exposing (MetersPerSecond)
@@ -22,7 +23,7 @@ type FrontendPlayerCoordinates
 
 
 type alias BackendModel =
-    {}
+    { world : World Int }
 
 
 type FrontendMsg

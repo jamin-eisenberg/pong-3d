@@ -1,6 +1,7 @@
 module Backend exposing (..)
 
 import Lamdera exposing (ClientId, SessionId)
+import Physics.World as World
 import Types exposing (..)
 
 
@@ -19,7 +20,7 @@ app =
 
 init : ( Model, Cmd BackendMsg )
 init =
-    ( {}
+    ( { world = World.empty }
     , Cmd.none
     )
 
