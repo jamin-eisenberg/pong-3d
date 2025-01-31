@@ -1,11 +1,11 @@
 module Types exposing (..)
 
+import AssocSet exposing (Set)
 import Direction2d exposing (Direction2d)
 import Evergreen.V1.Types exposing (ToFrontend(..))
 import Lamdera exposing (ClientId)
 import Pixels exposing (Pixels)
 import Quantity exposing (Quantity)
-import Set.Any exposing (AnySet)
 import Speed exposing (MetersPerSecond)
 import Url exposing (Url)
 import Vector2d exposing (Vector2d)
@@ -18,7 +18,7 @@ type alias FrontendModel =
 
 
 type alias Keys =
-    AnySet Int Key
+    Set Key
 
 
 type FrontendPlayerCoordinates

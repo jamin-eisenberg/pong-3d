@@ -1,6 +1,7 @@
 module Frontend exposing (..)
 
 import Angle
+import AssocSet exposing (Set)
 import Block3d
 import Browser exposing (UrlRequest(..))
 import Browser.Dom
@@ -17,13 +18,11 @@ import Json.Decode
 import Lamdera
 import Length exposing (Meters)
 import LineSegment3d exposing (LineSegment3d)
-import List.Extra
 import Physics.Coordinates exposing (WorldCoordinates)
 import Pixels
 import Point3d
 import Scene3d
 import Scene3d.Material as Material
-import Set.Any exposing (AnySet)
 import Speed exposing (MetersPerSecond)
 import Sphere3d
 import Task
@@ -61,7 +60,7 @@ subscriptions _ =
 
 init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init _ _ =
-    ( { keysPressed = Set.Any.empty keyToInt
+    ( { keysPressed = AssocSet.empty
       , viewportSize = { width = Pixels.int 0, height = Pixels.int 0 }
       }
     , Task.perform
@@ -81,16 +80,16 @@ update msg model =
         KeyDown key ->
             let
                 newKeysPressed =
-                    Set.Any.insert key model.keysPressed
+                    AssocSet.insert key model.keysPressed
             in
-            ( { model | keysPressed = newKeysPressed }, Lamdera.sendToBackend (PlayerInput newKeysPressed) )
+            updateKeysIfChanged newKeysPressed model
 
         KeyUp key ->
             let
                 newKeysPressed =
-                    Set.Any.remove key model.keysPressed
+                    AssocSet.remove key model.keysPressed
             in
-            ( { model | keysPressed = newKeysPressed }, Lamdera.sendToBackend (PlayerInput newKeysPressed) )
+            updateKeysIfChanged newKeysPressed model
 
         Tick _ ->
             ( model, Cmd.none )
@@ -99,12 +98,20 @@ update msg model =
             ( { model | viewportSize = { width = Pixels.pixels width, height = Pixels.pixels height } }, Cmd.none )
 
 
-keysToDirection : AnySet comparable Key -> Vector2d MetersPerSecond FrontendPlayerCoordinates
+updateKeysIfChanged : Set Key -> Model -> ( Model, Cmd FrontendMsg )
+updateKeysIfChanged newKeysPressed model =
+    if AssocSet.eq newKeysPressed model.keysPressed then
+        ( model, Cmd.none )
+
+    else
+        ( { model | keysPressed = newKeysPressed }, Lamdera.sendToBackend (PlayerInput newKeysPressed) )
+
+
+keysToDirection : Set Key -> Vector2d MetersPerSecond FrontendPlayerCoordinates
 keysToDirection keys =
     keys
-        |> Set.Any.toList
-        |> List.map (keyToPlayerDirection >> playerDirection2d >> Direction2d.toVector)
-        |> List.foldr Vector2d.plus Vector2d.zero
+        |> AssocSet.map (keyToPlayerDirection >> playerDirection2d >> Direction2d.toVector)
+        |> AssocSet.foldr Vector2d.plus Vector2d.zero
         |> Vector2d.normalize
         |> Vector2d.toUnitless
         |> (\{ x, y } -> Vector2d.metersPerSecond x y)
