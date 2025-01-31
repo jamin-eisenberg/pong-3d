@@ -19,9 +19,11 @@ See <https://dashboard.lamdera.app/docs/evergreen> for more info.
 
 -}
 
+import AssocSet
 import Evergreen.V2.Types
 import Evergreen.V4.Types
 import Lamdera.Migrations exposing (..)
+import Pixels
 
 
 frontendModel : Evergreen.V2.Types.FrontendModel -> ModelMigration Evergreen.V4.Types.FrontendModel Evergreen.V4.Types.FrontendMsg
@@ -61,7 +63,7 @@ migrate_Types_BackendModel old =
 
 migrate_Types_FrontendModel : Evergreen.V2.Types.FrontendModel -> Evergreen.V4.Types.FrontendModel
 migrate_Types_FrontendModel old =
-    {}
+    { keysPressed = AssocSet.empty, viewportSize = { width = Pixels.int 0, height = Pixels.int 0 } }
 
 
 migrate_Types_FrontendMsg : Evergreen.V2.Types.FrontendMsg -> Evergreen.V4.Types.FrontendMsg
