@@ -15,6 +15,7 @@ import Vector2d exposing (Vector2d)
 type alias FrontendModel =
     { keysPressed : Set Key
     , viewportSize : { width : Quantity Int Pixels, height : Quantity Int Pixels }
+    , world : World Id
     }
 
 
@@ -23,14 +24,37 @@ type FrontendPlayerCoordinates
 
 
 type alias BackendModel =
-    { world : World Int }
+    { world : World Id
+    , players : List Player
+    }
+
+
+type alias Player =
+    { side : Side
+    , clientId : ClientId
+    }
+
+
+type Id
+    = Ball
+    | WallOn Side
+    | PlayerOn Side
+
+
+type Side
+    = FrontSide
+    | BackSide
+    | LeftSide
+    | RightSide
+    | TopSide
+    | BottomSide
 
 
 type FrontendMsg
     = NoOpFrontendMsg
     | KeyDown Key
     | KeyUp Key
-    | Tick Float -- delta time in ms
+    | FrontendTick Float -- delta time in ms
     | Resize { width : Int, height : Int }
 
 
@@ -59,7 +83,12 @@ type ToBackend
 
 type BackendMsg
     = NoOpBackendMsg
+    | Connected ClientId
+    | Disconnected ClientId
+    | BackendTick Float -- delta time in ms
 
 
 type ToFrontend
     = NoOpToFrontend
+    | JoinRejected
+    | WorldUpdate (World Id)

@@ -18,8 +18,11 @@ import Json.Decode
 import Lamdera
 import Length exposing (Meters)
 import LineSegment3d exposing (LineSegment3d)
+import Physics.Body as Body
 import Physics.Coordinates exposing (WorldCoordinates)
+import Physics.World as World
 import Pixels
+import Platform.Cmd as Cmd
 import Point3d
 import Scene3d
 import Scene3d.Material as Material
@@ -51,7 +54,7 @@ app =
 subscriptions : Model -> Sub FrontendMsg
 subscriptions _ =
     Sub.batch
-        [ Browser.Events.onAnimationFrameDelta Tick
+        [ Browser.Events.onAnimationFrameDelta FrontendTick
         , Browser.Events.onKeyDown (Json.Decode.map KeyDown keyDecoder)
         , Browser.Events.onKeyUp (Json.Decode.map KeyUp keyDecoder)
         , Browser.Events.onResize (\w h -> Resize { width = w, height = h })
@@ -62,6 +65,7 @@ init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init _ _ =
     ( { keysPressed = AssocSet.empty
       , viewportSize = { width = Pixels.int 0, height = Pixels.int 0 }
+      , world = World.empty
       }
     , Task.perform
         (\{ viewport } ->
@@ -91,7 +95,7 @@ update msg model =
             in
             updateKeysIfChanged newKeysPressed model
 
-        Tick _ ->
+        FrontendTick _ ->
             ( model, Cmd.none )
 
         Resize { width, height } ->
@@ -239,6 +243,12 @@ updateFromBackend msg model =
         NoOpToFrontend ->
             ( model, Cmd.none )
 
+        JoinRejected ->
+            Debug.todo "Join rejected"
+
+        WorldUpdate world ->
+            ( { model | world = world }, Cmd.none )
+
 
 view : Model -> Browser.Document FrontendMsg
 view model =
@@ -257,11 +267,20 @@ view model =
                 , dimensions = ( model.viewportSize.width, model.viewportSize.height )
                 , background = Scene3d.backgroundColor Color.darkCharcoal
                 , clipDepth = Length.meters 0.1
-                , entities = boxFrame ++ [ ballSphere ]
+                , entities = boxFrame ++ List.map displayBody (World.bodies model.world)
                 }
             ]
         ]
     }
+
+
+
+-- TODO add dimensional info to Id
+
+
+displayBody : Body.Body Id -> Scene3d.Entity WorldCoordinates
+displayBody body =
+    Scene3d.placeIn (Body.frame body) (Scene3d.sphere (Material.color Color.lightBlue) (Sphere3d.atOrigin (Length.meters 0.1)))
 
 
 boxFrame : List (Scene3d.Entity coordinates)
