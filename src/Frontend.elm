@@ -244,8 +244,9 @@ updateFromBackend msg model =
             ( model, Cmd.none )
 
         JoinRejected ->
-            Debug.todo "Join rejected"
+            ( model, Cmd.none )
 
+        -- TODO join rejected
         WorldUpdate world ->
             ( { model | world = world }, Cmd.none )
 
