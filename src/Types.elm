@@ -32,6 +32,7 @@ type alias BackendModel =
 type alias Player =
     { side : Side
     , clientId : ClientId
+    , movementDirection : Maybe PlayerMovementDirection
     }
 
 
